@@ -7,16 +7,19 @@ class UserController extends Controller
     {
         parent::__construct();
         $this->call->model('UsersModel');
-        $this->call->helper('url');
+        $this->call->library('session');
     }
 
     public function before_action()
     {
-        if (!$this->session->userdata('authenticated')) {
-            redirect('/login');
+        if (!$this->session->userdata('user_id')) {
+            redirect(site_url('login'));
+            return;
         }
+
         if ($this->session->userdata('role') !== 'admin') {
-            redirect('/products');
+            redirect(site_url('products'));
+            return;
         }
     }
 
@@ -31,15 +34,15 @@ class UserController extends Controller
         ];
         $error = null;
 
-        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        if ($this->request->is_post()) {
             $user = [
-                'firstname' => trim((string)($_POST['firstname'] ?? '')),
-                'lastname' => trim((string)($_POST['lastname'] ?? '')),
-                'email' => trim((string)($_POST['email'] ?? '')),
-                'username' => trim((string)($_POST['username'] ?? '')),
-                'role' => ($_POST['role'] ?? 'user') === 'admin' ? 'admin' : 'user',
+                'firstname' => trim((string) $this->request->post('firstname')),
+                'lastname' => trim((string) $this->request->post('lastname')),
+                'email' => trim((string) $this->request->post('email')),
+                'username' => trim((string) $this->request->post('username')),
+                'role' => $this->request->post('role') === 'admin' ? 'admin' : 'user',
             ];
-            $password = (string)($_POST['password'] ?? '');
+            $password = (string) $this->request->post('password');
 
             if ($user['firstname'] === '' || $user['lastname'] === '' ||
                 !filter_var($user['email'], FILTER_VALIDATE_EMAIL) ||
@@ -51,7 +54,8 @@ class UserController extends Controller
             } else {
                 $user['password'] = password_hash($password, PASSWORD_DEFAULT);
                 $this->UsersModel->insert($user);
-                redirect('/products');
+                redirect(site_url('products'));
+                return;
             }
         }
 

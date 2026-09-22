@@ -48,6 +48,8 @@ require_once APP_DIR . 'config/middleware.php';
 
 $router->get('/', 'AuthController::register')->middleware('guest');
 $router->get('/users', 'UsersController::index');
+$router->get('/users/create', 'UserController::create')->middleware(['auth', 'admin']);
+$router->post('/users/create', 'UserController::create')->middleware(['auth', 'admin']);
 
 /*
 | -------------------------------------------------------------------
