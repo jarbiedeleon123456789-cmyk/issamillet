@@ -17,9 +17,9 @@ EXECUTE add_role_column;
 DEALLOCATE PREPARE add_role_column;
 
 INSERT INTO users (firstname, lastname, email, username, password, role)
-SELECT 'Pantry', 'Admin', 'admin@marrows.local', 'admin', '$2y$12$ALTz7Zih1joxVOwOqVmRpOCOyoo49M3kRqwYR1XR/CJBd9X9G/a4y', 'admin'
+SELECT 'Pantry', 'Admin', 'admin@marrows.local', 'admin', '$2y$12$Cg1.zk4hIYqBMlG88DEFYuKMks86UAAkvENzgP0Llt5LovoBOEuGy', 'admin'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'admin');
 
 INSERT INTO users (firstname, lastname, email, username, password, role)
-SELECT 'Pantry', 'User', 'user@marrows.local', 'user', '$2y$12$ALTz7Zih1joxVOwOqVmRpOCOyoo49M3kRqwYR1XR/CJBd9X9G/a4y', 'user'
+SELECT 'Pantry', 'User', 'user@marrows.local', 'user', '$2y$12$Cg1.zk4hIYqBMlG88DEFYuKMks86UAAkvENzgP0Llt5LovoBOEuGy', 'user'
 WHERE NOT EXISTS (SELECT 1 FROM users WHERE username = 'user');
