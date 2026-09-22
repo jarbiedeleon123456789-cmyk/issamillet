@@ -7,23 +7,21 @@ class UsersController extends Controller
     {
         parent::__construct();
         $this->call->model('UsersModel');
+        $this->call->library('session');
     }
 
-    public function before_action()
-    {
-        if (!$this->session->userdata('authenticated')) {
-            redirect('/login');
-        }
-        if ($this->session->userdata('role') !== 'admin') {
-            redirect('/products');
-        }
-    }
-
+    /**
+     * Retrieve all users and display them in the view.
+     */
     public function index()
     {
         $users = $this->UsersModel->all();
 
-        $this->call->view('users_view', ['users' => $users]);
+        $data['users'] = $users;
+        $data['username'] = $this->session->userdata('username');
+        $data['role'] = $this->session->userdata('role') ?: 'user';
+
+        $this->call->view('users_view', $data);
     }
 }
-?>
+

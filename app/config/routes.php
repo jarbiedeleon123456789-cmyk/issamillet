@@ -44,16 +44,32 @@ defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 */
 /** @var object $router **/
 
-$router->get('/', 'AuthController::login');
+require_once APP_DIR . 'config/middleware.php';
+
+$router->get('/', 'AuthController::register')->middleware('guest');
 $router->get('/users', 'UsersController::index');
-$router->get('/login', 'AuthController::login');
-$router->post('/login', 'AuthController::login');
+
+/*
+| -------------------------------------------------------------------
+| AUTHENTICATION ROUTES
+| -------------------------------------------------------------------
+*/
+$router->get('/login', 'AuthController::login')->middleware('guest');
+$router->post('/login', 'AuthController::authenticate')->middleware('guest');
+$router->get('/register', 'AuthController::register')->middleware('guest');
+$router->post('/register', 'AuthController::store')->middleware('guest');
 $router->get('/logout', 'AuthController::logout');
-$router->get('/products', 'ProductController::index');
-$router->get('/products/create', 'ProductController::create');
-$router->post('/products/create', 'ProductController::create');
-$router->get('/products/edit/{id}', 'ProductController::edit');
-$router->post('/products/edit/{id}', 'ProductController::edit');
-$router->post('/products/delete/{id}', 'ProductController::delete');
-$router->get('/users/create', 'UserController::create');
-$router->post('/users/create', 'UserController::create');
+
+/*
+| -------------------------------------------------------------------
+| PRODUCT MANAGEMENT ROUTES (protected - requires login)
+| -------------------------------------------------------------------
+*/
+$router->group(['prefix' => '/products', 'middleware' => 'auth'], function ($router) {
+    $router->get('/', 'ProductController::index');
+    $router->get('/create', 'ProductController::create')->middleware('admin');
+    $router->post('/create', 'ProductController::store')->middleware('admin');
+    $router->get('/edit/{id}', 'ProductController::edit')->where_number('id')->middleware('admin');
+    $router->post('/edit/{id}', 'ProductController::update')->where_number('id')->middleware('admin');
+    $router->post('/delete/{id}', 'ProductController::delete')->where_number('id')->middleware('admin');
+});

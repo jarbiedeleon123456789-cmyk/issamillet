@@ -1,14 +1,14 @@
 <?php
 defined('PREVENT_DIRECT_ACCESS') OR exit('No direct script access allowed');
 
-class ProductModel extends Model
+class AuthModel extends Model
 {
     /**
      * Table Name of the Database
      *
      * @var string
      */
-    protected $table = 'products';
+    protected $table = 'users';
 
     /**
      * Primary Key of the Database Column
@@ -22,24 +22,26 @@ class ProductModel extends Model
      *
      * @var array
      */
-    protected $fillable = ['product_name', 'description', 'price', 'quantity'];
+    protected $fillable = ['username', 'email', 'password', 'role', 'is_active'];
 
     /**
-     * Timestamps are handled by the database default (CURRENT_TIMESTAMP)
+     * Timestamps handled by DB defaults (created_at) / manual updated_at
      *
      * @var boolean
      */
     protected $timestamps = false;
 
     /**
-     * Get all products ordered by newest first
+     * Find a user by username or email (used at login)
      *
-     * @return array
+     * @param string $identity
+     * @return mixed
      */
-    public function all_products()
+    public function find_by_identity($identity)
     {
         return $this->db->table($this->table)
-            ->order_by('created_at', 'DESC')
-            ->get_all() ?: [];
+            ->where('username', $identity)
+            ->or_where('email', $identity)
+            ->get();
     }
 }
