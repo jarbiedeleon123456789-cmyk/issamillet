@@ -42,15 +42,17 @@ class AuthController extends Controller
 
         $user = $this->AuthModel->find_by_identity($identity);
 
-        if (!$user || !password_verify($password, $user['password'])) {
+        if (!is_array($user) || empty($user['password']) || !password_verify($password, $user['password'])) {
             $this->session->set_flashdata('error', 'Invalid credentials. Please try again.');
             $this->session->set_flashdata('old', ['identity' => $identity]);
             redirect(site_url('login'));
+            return;
         }
 
         if (isset($user['is_active']) && (int) $user['is_active'] !== 1) {
             $this->session->set_flashdata('error', 'This account has been deactivated.');
             redirect(site_url('login'));
+            return;
         }
 
         $this->session->regenerate_on_login(true);
@@ -68,6 +70,7 @@ class AuthController extends Controller
         $this->session->set_flashdata('success', 'Welcome back, ' . $user['username'] . '!');
 
         redirect($redirect_to ?: site_url('products'));
+        return;
     }
 
     /**
