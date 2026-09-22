@@ -29,12 +29,23 @@ class ProductController extends Controller
      */
     public function create()
     {
+        $data['product']  = [
+            'product_name' => '',
+            'description'  => '',
+            'price'        => '',
+            'quantity'     => '',
+        ];
+        $data['mode']     = 'create';
         $data['error']    = $this->session->flashdata('error');
         $data['old']      = $this->session->flashdata('old') ?: [];
         $data['username'] = $this->session->userdata('username');
         $data['role']     = $this->session->userdata('role') ?: 'user';
 
-        $this->call->view('products/create', $data);
+        if (!empty($data['old'])) {
+            $data['product'] = array_merge($data['product'], $data['old']);
+        }
+
+        $this->call->view('products/form', $data);
     }
 
     /**
@@ -80,11 +91,12 @@ class ProductController extends Controller
         }
 
         $data['product']  = $product;
+        $data['mode']     = 'edit';
         $data['error']    = $this->session->flashdata('error');
         $data['username'] = $this->session->userdata('username');
         $data['role']     = $this->session->userdata('role') ?: 'user';
 
-        $this->call->view('products/edit', $data);
+        $this->call->view('products/form', $data);
     }
 
     /**
